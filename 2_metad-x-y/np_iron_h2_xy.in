@@ -1,0 +1,43 @@
+variable boxLen     equal 4
+variable gb_gap     equal 1.0
+variable box_margin equal 2.0
+variable h_num      equal 1
+#variable rot1_vec_x equal 1
+#variable rot1_vec_y equal 1
+#variable rot1_vec_z equal 1
+#variable rot1_deg   equal 45
+#variable rot2_vec_x equal 0
+#variable rot2_vec_y equal 1
+#variable rot2_vec_z equal 1
+#variable rot2_deg   equal 30
+
+variable title      string   box${boxLen}r1x${rot1_vec_x}r1y${rot1_vec_y}r1z${rot1_vec_z}r1d${rot1_deg}
+
+log ${title}.equ
+
+units metal
+atom_style bond 
+boundary p p p
+read_data np_${title}.equ.min.data 
+
+pair_style eam/fs
+pair_coeff * * PotentialB.fs Fe H
+bond_style morse
+bond_coeff 1 2.802438 1.33793 1.059941531
+special_bonds charmm
+
+group iron  type 1
+group h_mol type 2
+
+compute h_msd h_mol msd
+compute h_adh h_mol group/group iron pair yes
+
+thermo		10000
+thermo_style custom step temp pxx pyy c_h_msd[4] c_h_adh
+timestep	0.0005
+
+fix     1 h_mol nvt temp 333 333 0.1 
+fix     2 all colvars xy.colvars.in output ${title}
+run     200000000
+unfix   1
+

@@ -1,0 +1,94 @@
+# Definition for distance variable
+colvarsTrajFrequency 10000
+colvar {
+    name fe_h2_cn
+    width 1.0 # Spacing of grids 
+    lowerBoundary  0.0
+    upperBoundary 80.0 
+    coordNum {
+        group1 { atomNumbers      129 130 }
+        group2 { atomNumbersRange   1-128 } 
+    }
+}
+
+colvar {
+    name fe_h2_Z
+    width 0.1 # Spacing of grids 
+    lowerBoundary  2.8
+    upperBoundary  8.8
+    hardLowerBoundary yes
+    hardUpperBoundary yes
+    distanceZ {
+        main { atomNumbers      129 130 }
+        ref  { atomNumbersRange   1-128 } 
+        axis { (0.0, 0.0, 1.0) } 
+    }
+}
+
+harmonicWalls {
+  name  wallZ
+  colvars    fe_h2_Z
+  lowerWalls  2.8
+  upperWalls  8.8 
+  lowerWallConstant 10.0 
+  upperWallConstant 10.0 
+} 
+
+colvar {
+    name fe_h2_X
+    width 0.1 # Spacing of grids 
+    lowerBoundary -5.7
+    upperBoundary  5.7
+    hardLowerBoundary yes
+    hardUpperBoundary yes  
+    distanceZ {
+        main { atomNumbers      129 130 }
+        ref  { atomNumbersRange   1-128 } 
+        axis { (1.0, 0.0, 0.0) } 
+    }
+}
+
+colvar {
+    name fe_h2_Y
+    width 0.1 # Spacing of grids 
+    lowerBoundary -5.7
+    upperBoundary  5.7
+    hardLowerBoundary yes
+    hardUpperBoundary yes  
+    distanceZ {
+        main { atomNumbers      129 130 }
+        ref  { atomNumbersRange   1-128 } 
+        axis { (0.0, 1.0, 0.0) } 
+    }
+}
+
+harmonicWalls {
+  name  wallX
+  colvars    fe_h2_X
+  lowerWalls -5.7 
+  upperWalls  5.7 
+  lowerWallConstant 10.0 
+  upperWallConstant 10.0 
+} 
+
+harmonicWalls {
+  name  wallY
+  colvars    fe_h2_Y
+  lowerWalls -5.7 
+  upperWalls  5.7 
+  lowerWallConstant 10.0 
+  upperWallConstant 10.0 
+} 
+
+metadynamics {
+    name H2_iron
+    outputFreq 50000000
+    keepFreeEnergyFiles on
+    colvars fe_h2_X fe_h2_Y
+    newHillFrequency 1000 # This is a rather high frequency
+    hillWeight 0.01 # This is a rather high strength
+    hillWidth 2.0 # Note: this is a multiple of dist's width
+                  # The Gaussian half-width (sigma) will be printed on-screen)
+}
+
+
