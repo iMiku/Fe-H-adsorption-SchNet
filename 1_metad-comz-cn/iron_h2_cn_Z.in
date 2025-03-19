@@ -1,0 +1,30 @@
+variable title      string   fe100
+
+log ${title}.equ
+
+units metal
+atom_style bond 
+boundary p p p
+read_data ${title}.data 
+
+pair_style eam/fs
+pair_coeff * * PotentialB.fs Fe H
+bond_style morse
+bond_coeff 1 2.802438 1.33793 1.059941531
+special_bonds charmm
+
+group iron  type 1
+group h_mol type 2
+
+compute h_msd h_mol msd
+compute h_adh h_mol group/group iron pair yes
+
+thermo		10000
+thermo_style custom step temp pxx pyy c_h_msd[4] c_h_adh
+timestep	0.0005
+
+fix     1 h_mol nvt temp 333 333 0.1 
+fix     2 all colvars cn_Z.colvars.in output ${title}
+run     200000000
+unfix   1
+
